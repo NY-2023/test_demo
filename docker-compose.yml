@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:alpine
+    container_name: poland-database
+    environment:
+      - POSTGRES_PASSWORD=verysecretpassword
+      - POSTGRES_USER=poland
+      - POSTGRES_DB=poland
+    ports:
+      - "5432:5432"
+    volumes:
+      - './.postgres:/docker-entrypoint-initdb.d:ro'
+
+  backend:
+    build: ./server
+    container_name: poland-backend
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=poland
+      - POSTGRES_USER=poland
+      - POSTGRES_PASSWORD=verysecretpassword
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./client
+    container_name: poland-frontend
+    restart: unless-stopped
+    environment:
+      - NGINX_ENTRYPOINT_QUIET_LOGS=1
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
