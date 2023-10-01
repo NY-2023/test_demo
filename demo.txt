@@ -1,1 +1,1 @@
-Hello world of git
+Hello to the world of git.
